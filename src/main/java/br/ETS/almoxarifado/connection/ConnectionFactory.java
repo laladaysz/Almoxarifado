@@ -5,14 +5,11 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConnectionFactory {
-
     public Connection recuperarConexao() {
         try {
-            DriverManager.getConnection("jdbc:mysql://localhost:3306/almoxarifado?"+"user=root");
-            System.out.println("Conexão realizada com sucesso");
+            return DriverManager.getConnection("jdbc:mysql://localhost:3306/almoxarifado?"+"user=root");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return null;
     }
 }

@@ -1,11 +1,15 @@
 package br.ETS.almoxarifado.produto;
 
 import br.ETS.almoxarifado.RegraDaAplicacaoException;
+import br.ETS.almoxarifado.connection.ConnectionFactory;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 
 public class ProdutoService {
     private ArrayList<Produto> produtos = new ArrayList<>();
+
+    private ConnectionFactory connectionFactory= new ConnectionFactory();
 
     public void adicionarNovoProduto(ProdutoDTO data) {
         var produto = new Produto(data);
@@ -14,12 +18,14 @@ public class ProdutoService {
             throw new RegraDaAplicacaoException("Já existe um produto com esse ID.");
         }
 
-        produtos.add(produto);
+        Connection connection = connectionFactory.recuperarConexao();
+        new ProdutoDAO(connection).salvar(data);
 
     }
 
     public ArrayList<Produto> exibirProdutosDoAlmoxarifado () {
-        return produtos;
+        Connection connection = connectionFactory.recuperarConexao();
+        return new ProdutoDAO(connection).listar();
     }
 
     public Produto encontrarProdutoPeloID(int id){
@@ -49,7 +55,7 @@ public class ProdutoService {
 
     }
 
-    public String retirarQuantidade (int id, int quantidade) {
+    public void retirarQuantidade (int id, int quantidade) {
         var produto = encontrarProdutoPeloID(id);
 
         if (quantidade > produto.getQuantidade()) {
@@ -57,17 +63,16 @@ public class ProdutoService {
         }
 
         if (quantidade <= 0) {
-            throw new RegraDaAplicacaoException("A quantidade removida deve ser maior do que zero!")
+            throw new RegraDaAplicacaoException("A quantidade removida deve ser maior do que zero!");
         }
 
         produto.setQuantidade(produto.getQuantidade()-quantidade);
-        return ("Quantidade removida");
+
     }
 
-    public String deletarProduto (int id) {
+    public void deletarProduto (int id) {
         var produto = encontrarProdutoPeloID(id);
         produtos.remove(produto);
 
-        return ("Produto excluído com sucesso!");
     }
 }
