@@ -11,6 +11,15 @@ public class ProdutoService {
 
     private ConnectionFactory connectionFactory= new ConnectionFactory();
 
+    public Produto encontrarProdutoPeloID(int id){
+        Connection connection = connectionFactory.recuperarConexao();
+        Produto produto = new ProdutoDAO(connection).listarPorID(id);
+        if(produto!=null) {
+            return produto;
+        }
+        throw new RegraDaAplicacaoException("Produto não encontrado");
+    }
+
     public void adicionarNovoProduto(ProdutoDTO data) {
         var produto = new Produto(data);
 
@@ -28,14 +37,14 @@ public class ProdutoService {
         return new ProdutoDAO(connection).listar();
     }
 
-    public Produto encontrarProdutoPeloID(int id){
-        for(Produto produto: produtos) {
-            if(produto.getId() == id) {
-                return produto;
-            }
-        }
-        throw new RegraDaAplicacaoException("Produto com este ID não foi encontrado");
-    }
+//    public Produto encontrarProdutoPeloID(int id){
+//        for(Produto produto: produtos) {
+//            if(produto.getId() == id) {
+//                return produto;
+//            }
+//        }
+//        throw new RegraDaAplicacaoException("Produto com este ID não foi encontrado");
+//    }
 
     public Produto encontrarPeloID (int id) {
         return produtos
