@@ -1,8 +1,10 @@
 package br.ETS.almoxarifado.produto;
 
+import javax.xml.stream.events.DTD;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class ProdutoDAO {
@@ -11,6 +13,36 @@ public class ProdutoDAO {
         this.connection = connection;
     }
 
+    //find by id
+    public Produto listarPorID(int id){
+        String sql = "SELECT * FROM tbmateriaisdiretor WHERE id = ?";
+        PreparedStatement preparedStatement;
+        ResultSet resultSet;
+        Produto produto = null;
+        try {
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, id);
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                int numeroID = resultSet.getInt(1);
+                String nomeProduto = resultSet.getNString(2);
+                String partNumber = resultSet.getNString(3);
+                String divisao = resultSet.getNString(4);
+                int quantidade = resultSet.getInt(5);
+
+                ProdutoDTO dadosProduto = new ProdutoDTO(numeroID, nomeProduto, partNumber, divisao, quantidade);
+                produto = new Produto(dadosProduto);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return produto;
+    }
     public void salvar (ProdutoDTO dadosProduto){
         String sql = "INSERT INTO tbmateriaisdiretos(ID, PRODUTO, PARTNUMBER, DIVISAO, QUANTIDADE) VALUES (?, ?, ?, ?, ?)";
         var produto = new Produto(dadosProduto);
