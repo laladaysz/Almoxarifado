@@ -12,7 +12,7 @@ public class Produto {
     public Produto(ProdutoDTO dadosProduto) {
         this.id = dadosProduto.id();
         this.produto = dadosProduto.produto();
-        this.partNumber = dadosProduto.partnumber();
+        this.partNumber = dadosProduto.partNumber();
         this.divisao = dadosProduto.divisao();
         this.quantidade = dadosProduto.quantidade();
     }

@@ -1,6 +1,5 @@
 package br.ETS.almoxarifado;
 
-import br.ETS.almoxarifado.produto.Produto;
 import br.ETS.almoxarifado.produto.ProdutoDTO;
 import br.ETS.almoxarifado.produto.ProdutoService;
 
@@ -10,93 +9,103 @@ public class Main {
     private static ProdutoService produtoService = new ProdutoService();
     private static Scanner scanner = new Scanner(System.in);
 
-    private static int exibirMenu() {
+    private static int exibirMenu(){
         System.out.println("Almoxarifado ETS");
         System.out.println("""
-                           Selecione uma opção:
-                           1- Adicionar produto;
-                           2- Listar todos os produtos;
-                           3- Adicionar quantidade de um produto;
-                           4- Retirar quantidade de um produto do estoque;
-                           5- Deletar um produto;
-                           0- Sair;
-                           """);
-        return Integer.parseInt(scanner.nextLine()); // le tudo como string e depois retorna um inteiro com a opção escolhida pelo user
-    };
-
+                Selecione uma opção
+                1-) Inserir novo produto no almoxarifado
+                2-) Listar produtos do almoxarifado
+                3-) Adicionar determinada quantidade de um produto no almoxarifado
+                4-) Remover determinada quantidade de um produto do almoxarifado
+                5-) Remover um produto do almoxarifado
+                6-) Encerrar aplicação
+                """);
+        return Integer.parseInt(scanner.nextLine());
+    }
 
     public static void main(String[] args) {
         var opcao = exibirMenu();
 
-        while (opcao!= 6) {
+        while (opcao != 6){
             try {
-                switch (opcao) {
+                switch (opcao){
                     case 1 -> adicionarNovoProduto();
                     case 2 -> exibirProdutosCadastrados();
-                    case 3 -> adicionarQuantidade();
-                    case 4 -> removerQuantidade();
-                    case 5 -> removerProduto();
+                    case 3 -> adicionarQuantidadeDeUmProduto();
+                    case 4 -> removerQuantidadeDeUmProduto();
+                    case 5 -> removerOProdutoDoAlmoxarifado();
                 }
-            } catch (RegraDaAplicacaoException e) {
+            } catch (RegraDaAplicacaoException e){
                 System.out.println(e.getMessage());
-                System.out.println("Pressione ENTER para volar ao menu principal");
+                System.out.println("Pressione ENTER para voltar ao menu principal");
                 scanner.nextLine();
             }
-            opcao = exibirMenu();
+            opcao=exibirMenu();
         }
     }
 
-    private static void adicionarNovoProduto() {
+    private static void adicionarNovoProduto(){
         System.out.println("Insira o ID do produto que deseja cadastrar: ");
         var id = Integer.parseInt(scanner.nextLine());
-        System.out.println("Insira o nome do produto que deseja cadastrar: ");
+
+        System.out.println("Insira o nome que deseja cadastrar: ");
         var produto = scanner.nextLine();
+
         System.out.println("Insira o PARTNUMBER do produto que deseja cadastrar: ");
-        var partnumber = scanner.nextLine();
+        var partNumber = scanner.nextLine();
+
         System.out.println("Insira a divisão do produto que deseja cadastrar: ");
         var divisao = scanner.nextLine();
+
         System.out.println("Insira a quantidade desse produto: ");
         var quantidade = Integer.parseInt(scanner.nextLine());
 
-        produtoService.adicionarNovoProduto(new ProdutoDTO(id, produto, partnumber, divisao,quantidade));
+        produtoService.adicionarNovoProduto(new ProdutoDTO(id, produto, partNumber, divisao, quantidade));
 
-        System.out.printf("O produto %s foi cadastrado com sucesso\n", produto);
+        System.out.printf("O produto %s foi cadastrado com sucesso!\n", produto);
     }
 
     private static void exibirProdutosCadastrados(){
+        System.out.println("Os produtos cadastrados são: ");
         var produtos = produtoService.exibirProdutosDoAlmoxarifado();
         produtos.forEach(System.out::println);
         System.out.println("Pressione ENTER para voltar ao menu principal");
         scanner.nextLine();
     }
 
-    private static void adicionarQuantidade(){
-        System.out.println("Insira o ID do produto que deseja adicionar quantidade: ");
+    private static void adicionarQuantidadeDeUmProduto(){
+        System.out.println("Digite o ID do produto que deseja adicionar: ");
         var id = Integer.parseInt(scanner.nextLine());
-        System.out.println("Insira a quantidade que deseja adicionar do produto: ");
+
+        System.out.println("Digite a quantidade que deseja inserir desse produto: ");
         var quantidade = Integer.parseInt(scanner.nextLine());
 
         produtoService.adicionarQuantidadeDeUmProduto(id, quantidade);
+        System.out.printf("A quantidade de %d foi adicionada ao produto com id %d", quantidade, id);
         System.out.println("Pressione ENTER para voltar ao menu principal");
         scanner.nextLine();
     }
 
-    private static void removerQuantidade(){
-        System.out.println("Insira o ID do produto que deseja retirar quantidade: ");
+    private static void removerQuantidadeDeUmProduto(){
+        System.out.println("Digite o ID do produto que deseja retirar: ");
         var id = Integer.parseInt(scanner.nextLine());
-        System.out.println("Insira a quantidade que deseja remover do produto: ");
+
+        System.out.println("Digite a quantidade que deseja retirar desse produto: ");
         var quantidade = Integer.parseInt(scanner.nextLine());
 
-        produtoService.retirarQuantidade(id, quantidade);
+        produtoService.removerQuantidadeDeUmProduto(id, quantidade);
+
+        System.out.printf("A quantidade de %d foi removida do produto com id %d", quantidade, id);
         System.out.println("Pressione ENTER para voltar ao menu principal");
         scanner.nextLine();
     }
 
-    private static void removerProduto(){
-        System.out.println("Insira o ID do produto que deseja remover do estoque: ");
+    private static void removerOProdutoDoAlmoxarifado(){
+        System.out.println("Digite o ID do produto que deseja remover do almoxarifado");
         var id = Integer.parseInt(scanner.nextLine());
 
-        produtoService.deletarProduto(id);
+        produtoService.removerOProdutoDoAlmoxarifado(id);
+        System.out.printf("O produto com %d foi removido com sucesso", id);
         System.out.println("Pressione ENTER para voltar ao menu principal");
         scanner.nextLine();
     }

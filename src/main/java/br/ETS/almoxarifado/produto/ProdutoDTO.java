@@ -3,7 +3,7 @@ package br.ETS.almoxarifado.produto;
 public record ProdutoDTO(
         int id,
         String produto,
-        String partnumber,
+        String partNumber,
         String divisao,
         int quantidade
 ) {

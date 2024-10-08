@@ -9,79 +9,64 @@ import java.util.ArrayList;
 public class ProdutoService {
     private ArrayList<Produto> produtos = new ArrayList<>();
 
-    private ConnectionFactory connectionFactory= new ConnectionFactory();
+    private ConnectionFactory connectionFactory;
 
-    public Produto encontrarProdutoPeloID(int id){
-        Connection connection = connectionFactory.recuperarConexao();
-        Produto produto = new ProdutoDAO(connection).listarPorID(id);
-        if(produto!=null) {
-            return produto;
-        }
-        throw new RegraDaAplicacaoException("Produto não encontrado");
+    public ProdutoService(){
+        this.connectionFactory = new ConnectionFactory();
     }
 
-    public void adicionarNovoProduto(ProdutoDTO data) {
-        var produto = new Produto(data);
+    public void adicionarNovoProduto(ProdutoDTO dadosProduto){
+        var produto = new Produto(dadosProduto);
 
-        if(produtos.contains(produto)) {
-            throw new RegraDaAplicacaoException("Já existe um produto com esse ID.");
+        if(produtos.contains(produto)){
+            throw new RegraDaAplicacaoException("Já existe um produto com este ID");
         }
-
         Connection connection = connectionFactory.recuperarConexao();
-        new ProdutoDAO(connection).salvar(data);
-
+        new ProdutoDAO(connection).salvar(dadosProduto);
     }
 
-    public ArrayList<Produto> exibirProdutosDoAlmoxarifado () {
+    public ArrayList<Produto> exibirProdutosDoAlmoxarifado(){
         Connection connection = connectionFactory.recuperarConexao();
         return new ProdutoDAO(connection).listar();
     }
 
-//    public Produto encontrarProdutoPeloID(int id){
-//        for(Produto produto: produtos) {
-//            if(produto.getId() == id) {
-//                return produto;
-//            }
-//        }
-//        throw new RegraDaAplicacaoException("Produto com este ID não foi encontrado");
-//    }
+    public Produto encontrarProdutoPeloID(int id){
+        Connection connection = connectionFactory.recuperarConexao();
+        Produto produto = new ProdutoDAO(connection).listarPorID(id);
 
-    public Produto encontrarPeloID (int id) {
-        return produtos
-                .stream()
-                .filter(produto -> produto.getId() == id)
-                .findFirst().orElseThrow( () -> new RegraDaAplicacaoException("Produto com esse ID não foi encontrado."));
+        if(produto!=null){
+            return produto;
+        }
+        throw new RegraDaAplicacaoException("Produto não encontrado!");
     }
 
-    public void adicionarQuantidadeDeUmProduto (int id, int quantidade) {
+    public void adicionarQuantidadeDeUmProduto(int id, int quantidade){
         var produto = encontrarProdutoPeloID(id);
-
-        if (quantidade <= 0 ){
-            throw new RegraDaAplicacaoException("Quantidade a ser adicionada deve ser maior que zero!");
+        if(quantidade <= 0){
+            throw new RegraDaAplicacaoException("Quantidade a ser adicionada deve ser maior que 0");
         }
-
-        produto.setQuantidade(produto.getQuantidade() + quantidade);
-
+        Connection connection = connectionFactory.recuperarConexao();
+        new ProdutoDAO(connection).alterar(produto.getId(), produto.getQuantidade() + quantidade);
     }
 
-    public void retirarQuantidade (int id, int quantidade) {
+    public void removerQuantidadeDeUmProduto(int id, int quantidade){
+        if(quantidade <= 0){
+            throw new RegraDaAplicacaoException("Quantidade a ser removida deve ser maior que 0");
+        }
         var produto = encontrarProdutoPeloID(id);
-
-        if (quantidade > produto.getQuantidade()) {
-            throw new RegraDaAplicacaoException("Quantidade não disponível no estoque.");
+        if(produto.getQuantidade() < quantidade) {
+            throw new RegraDaAplicacaoException("A quantidade inserida é maior que a quantia de estoque");
         }
-
-        if (quantidade <= 0) {
-            throw new RegraDaAplicacaoException("A quantidade removida deve ser maior do que zero!");
-        }
-
-        produto.setQuantidade(produto.getQuantidade()-quantidade);
-
+        Connection connection = connectionFactory.recuperarConexao();
+        new ProdutoDAO(connection).alterar(produto.getId(), produto.getQuantidade() - quantidade);
     }
 
-    public void deletarProduto (int id) {
-        var produto = encontrarProdutoPeloID(id);
-        produtos.remove(produto);
-
+    public void removerOProdutoDoAlmoxarifado(int id){
+        if(encontrarProdutoPeloID(id) != null){
+            Connection connection = connectionFactory.recuperarConexao();
+            new ProdutoDAO(connection).deletar(id);
+        } else {
+            throw new RegraDaAplicacaoException("Não foi encontrado produto com esse ID");
+        }
     }
 }
